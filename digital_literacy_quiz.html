@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>디지털 리터러시 퀴즈</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .quiz-container {
+            max-width: 600px;
+            width: 90%;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div id="quiz" class="quiz-container bg-white p-8 rounded-2xl shadow-lg text-center transition-all duration-500">
+        <h1 id="title" class="text-3xl font-bold text-gray-800 mb-2">디지털 리터러시 퀴즈</h1>
+        <p id="description" class="text-gray-600 mb-8">당신의 디지털 지식을 테스트해보세요!</p>
+        
+        <div id="question-container" class="hidden">
+            <p id="progress" class="text-sm text-gray-500 mb-2"></p>
+            <div class="bg-gray-200 h-2 rounded-full mb-6">
+                <div id="progress-bar" class="bg-blue-500 h-2 rounded-full transition-all duration-300"></div>
+            </div>
+            <h2 id="question" class="text-2xl font-semibold text-gray-800 mb-6 min-h-[100px]"></h2>
+            <div id="answers" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            </div>
+        </div>
+
+        <div id="result-container" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-blue-600 mb-4">퀴즈 완료!</h2>
+            <p class="text-xl text-gray-700 mb-6">당신의 점수는 <span id="score" class="font-bold"></span>점 입니다.</p>
+            <button id="restart-button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 w-full">
+                다시 시작하기
+            </button>
+        </div>
+
+        <button id="start-button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 w-full">
+            퀴즈 시작하기
+        </button>
+
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "다음 중 가장 안전한 비밀번호는 무엇일까요?",
+                answers: [
+                    { text: "12345678", correct: false },
+                    { text: "password", correct: false },
+                    { text: "MyDogIsHappy!23", correct: true },
+                    { text: "qwerty", correct: false }
+                ]
+            },
+            {
+                question: "이메일 첨부파일을 열기 전 가장 먼저 확인해야 할 것은 무엇일까요?",
+                answers: [
+                    { text: "파일 크기", correct: false },
+                    { text: "보낸 사람의 이메일 주소와 신뢰성", correct: true },
+                    { text: "첨부파일 아이콘 모양", correct: false },
+                    { text: "이메일 제목", correct: false }
+                ]
+            },
+            {
+                question: "인터넷에서 찾은 정보를 과제에 사용할 때, 올바른 행동은 무엇일까요?",
+                answers: [
+                    { text: "내용을 그대로 복사해서 붙여넣기", correct: false },
+                    { text: "정보의 출처를 명확하게 밝히기", correct: true },
+                    { text: "친구가 대신 찾은 정보라고 말하기", correct: false },
+                    { text: "출처 없이 내 생각인 것처럼 사용하기", correct: false }
+                ]
+            },
+            {
+                question: "'피싱(Phishing)'이란 무엇을 의미할까요?",
+                answers: [
+                    { text: "온라인에서 물고기를 잡는 게임", correct: false },
+                    { text: "개인정보를 낚시하듯 빼내는 사기 수법", correct: true },
+                    { text: "바이러스를 치료하는 백신 프로그램", correct: false },
+                    { text: "무료로 소프트웨어를 공유하는 행위", correct: false }
+                ]
+            },
+            {
+                question: "SNS에 개인정보(주소, 전화번호 등)를 전체 공개로 설정하는 것은 안전할까요?",
+                answers: [
+                    { text: "네, 친구들과 정보를 공유하기 편리합니다.", correct: false },
+                    { text: "아니요, 범죄에 악용될 수 있어 위험합니다.", correct: true }
+                ]
+            },
+            {
+                question: "가짜 뉴스를 구별하는 방법으로 적절하지 않은 것은 무엇일까요?",
+                answers: [
+                    { text: "제목이 너무 자극적이거나 비현실적인지 확인한다.", correct: false },
+                    { text: "다른 신뢰할 수 있는 언론사에서도 보도되었는지 찾아본다.", correct: false },
+                    { text: "기사의 날짜가 현재와 관련 있는지 확인한다.", correct: false },
+                    { text: "내 생각과 일치하는 내용이므로 무조건 믿는다.", correct: true }
+                ]
+            },
+            {
+                question: "디지털 발자국(Digital Footprint)이란 무엇일까요?",
+                answers: [
+                    { text: "컴퓨터 화면에 남은 손자국", correct: false },
+                    { text: "인터넷 활동을 통해 웹에 남겨진 기록들", correct: true },
+                    { text: "키보드에 쌓인 먼지", correct: false },
+                    { text: "새로운 전자기기를 구매한 기록", correct: false }
+                ]
+            },
+            {
+                question: "온라인에서 타인에게 불쾌감을 주는 악성 댓글을 다는 행위를 무엇이라고 할까요?",
+                answers: [
+                    { text: "사이버 불링(Cyberbullying)", correct: true },
+                    { text: "디지털 페어런팅(Digital Parenting)", correct: false },
+                    { text: "네티켓(Netiquette)", correct: false },
+                    { text: "언박싱(Unboxing)", correct: false }
+                ]
+            },
+             {
+                question: "공공 와이파이(Wi-Fi)를 사용할 때 주의해야 할 점으로 올바른 것은 무엇일까요?",
+                answers: [
+                    { text: "비밀번호가 없으므로 마음껏 사용해도 안전하다.", correct: false },
+                    { text: "개인정보나 금융정보를 입력하는 것은 피해야 한다.", correct: true },
+                    { text: "속도가 빠르므로 중요한 파일을 다운로드한다.", correct: false },
+                    { text: "어떤 와이파이든 보안 수준은 모두 동일하다.", correct: false }
+                ]
+            },
+            {
+                question: "2단계 인증(Two-Factor Authentication)을 설정하는 주된 이유는 무엇일까요?",
+                answers: [
+                    { text: "로그인 속도를 더 빠르게 하기 위해", correct: false },
+                    { text: "계정 보안을 강화하여 해킹 위험을 줄이기 위해", correct: true },
+                    { text: "비밀번호를 더 자주 바꾸기 위해", correct: false },
+                    { text: "인터넷 사용 기록을 삭제하기 위해", correct: false }
+                ]
+            }
+        ];
+
+        const quizContainer = document.getElementById('quiz');
+        const titleElement = document.getElementById('title');
+        const descriptionElement = document.getElementById('description');
+        const questionContainer = document.getElementById('question-container');
+        const resultContainer = document.getElementById('result-container');
+        const questionElement = document.getElementById('question');
+        const answersElement = document.getElementById('answers');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const scoreElement = document.getElementById('score');
+        const progressElement = document.getElementById('progress');
+        const progressBar = document.getElementById('progress-bar');
+
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        startButton.addEventListener('click', startQuiz);
+        restartButton.addEventListener('click', startQuiz);
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            startButton.classList.add('hidden');
+            resultContainer.classList.add('hidden');
+            titleElement.classList.remove('hidden');
+            descriptionElement.classList.remove('hidden');
+            questionContainer.classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            resetState();
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionElement.innerText = currentQuestion.question;
+            
+            progressElement.innerText = `문제 ${currentQuestionIndex + 1} / ${quizData.length}`;
+            const progressPercentage = ((currentQuestionIndex + 1) / quizData.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+
+            currentQuestion.answers.forEach(answer => {
+                const button = document.createElement('button');
+                button.innerText = answer.text;
+                button.classList.add('bg-gray-100', 'p-4', 'rounded-lg', 'text-gray-800', 'hover:bg-gray-200', 'transition', 'duration-200', 'w-full', 'text-left');
+                if (answer.correct) {
+                    button.dataset.correct = answer.correct;
+                }
+                button.addEventListener('click', selectAnswer);
+                answersElement.appendChild(button);
+            });
+        }
+
+        function resetState() {
+            while (answersElement.firstChild) {
+                answersElement.removeChild(answersElement.firstChild);
+            }
+        }
+
+        function selectAnswer(e) {
+            const selectedButton = e.target;
+            const correct = selectedButton.dataset.correct === "true";
+
+            if (correct) {
+                score++;
+                selectedButton.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                selectedButton.classList.add('bg-green-500', 'text-white');
+            } else {
+                selectedButton.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                selectedButton.classList.add('bg-red-500', 'text-white');
+            }
+
+            Array.from(answersElement.children).forEach(button => {
+                 if (button.dataset.correct === "true") {
+                    button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                    button.classList.add('bg-green-500', 'text-white');
+                 }
+                button.disabled = true;
+            });
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }, 1000);
+        }
+
+        function showResult() {
+            questionContainer.classList.add('hidden');
+            titleElement.classList.add('hidden');
+            descriptionElement.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+            scoreElement.innerText = `${score} / ${quizData.length}`;
+        }
+
+    </script>
+</body>
+</html>
